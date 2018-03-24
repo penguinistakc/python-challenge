@@ -3,7 +3,7 @@
 import os
 import csv
 import pathlib
-#courtest of afhaque/us_state_abbrev.py -- no license found
+#courtesy of afhaque/us_state_abbrev.py -- no license found
 import us_state_abbrev
 
 
@@ -47,6 +47,9 @@ def open_file(file_dir, file_name, mode):
     if mode == "w":
         pathlib.Path(file_dir).mkdir(parents=True, exist_ok=True)
         return open(file_path,"w")
+    elif mode == "a":
+        pathlib.Path(file_dir).mkdir(parents=True, exist_ok = True)
+        return open(file_path,"a")
     else:
         #assume we are reading file
         return open(file_path)

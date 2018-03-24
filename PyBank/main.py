@@ -12,27 +12,16 @@ import pathlib
 
 #file information
 # name of input file
-input_file = "budget_test.csv"
+input_file = "budget_data_2.csv"
 
 #directory where input file is located
 input_dir = "raw_data"
 
 #name of output file
-output_file = "budget_test.output.txt"
+output_file = "budget_data_2.output.txt"
 
 #directory where output file should be located (should be a subdirectory of present working directory)
 output_dir = "output"
-
-# initialize variables
-first_month = True
-total_number_months_in_dataset = 0
-total_revenue_over_period = 0.0
-revenue_change_tracker = []
-last_month_revenue = 0
-amount_greatest_increase_in_revenue = 0.0
-month_greatest_increase_in_revenue = ""
-month_greatest_decrease_in_revenue = ""
-amount_greatest_decrease_in_revenue = 0.0   
 
 def open_file(file_dir, file_name, mode):
     """ if mode == "w", check for existence of output directory, and create if necessary
@@ -45,10 +34,6 @@ def open_file(file_dir, file_name, mode):
     else:
         #assume we are reading file
         return open(file_path)
-    
-
-
-    
 
 def calculate_change_in_revenue(new_revenue, old_revenue):
     """
@@ -66,6 +51,9 @@ def create_financial_analysis(total_number_months_in_dataset, total_revenue_over
                               revenue_change_tracker, month_greatest_increase_in_revenue,
                               amount_greatest_increase_in_revenue, amount_greatest_decrease_in_revenue, 
                               month_greatest_decrease_in_revenue):
+    """
+    display final output on terminal and in file
+    """
 
     header_line = ('-' * 30)
 
@@ -82,15 +70,22 @@ Greatest Decrease in Revenue: {month_greatest_decrease_in_revenue} (${amount_gre
     print(financial_analysis)
 
     #print to file
-    #with open("output.txt", "w") as outputfile:
-    #    outputfile.write(financial_analysis)
     with open_file(output_dir, output_file, "w") as outputfile:
         outputfile.write(financial_analysis)
 
+def main():
+    # initialize variables
+    first_month = True
+    total_number_months_in_dataset = 0
+    total_revenue_over_period = 0.0
+    revenue_change_tracker = []
+    last_month_revenue = 0.0
+    amount_greatest_increase_in_revenue = 0.0
+    month_greatest_increase_in_revenue = ""
+    month_greatest_decrease_in_revenue = ""
+    amount_greatest_decrease_in_revenue = 0.0   
 
-if __name__ == '__main__':
-
-    #open file
+    #open file -- "r" for read access, "w" for write access
     with open_file(input_dir, input_file, "r") as csvfile:
         reader = csv.reader(csvfile)
         #ignore first (header) row
@@ -114,13 +109,18 @@ if __name__ == '__main__':
             total_number_months_in_dataset += 1
             total_revenue_over_period = calculate_total_revenue(total_revenue_over_period,  monthly_revenue)
 
-        if change_in_revenue > amount_greatest_increase_in_revenue:
-            amount_greatest_increase_in_revenue = change_in_revenue
-            month_greatest_increase_in_revenue = period
+            if change_in_revenue > amount_greatest_increase_in_revenue:
+                amount_greatest_increase_in_revenue = change_in_revenue
+                month_greatest_increase_in_revenue = period
+            #elif change_in_revenue < amount_greatest_decrease_in_revenue:
+            if change_in_revenue < amount_greatest_decrease_in_revenue:
+                amount_greatest_decrease_in_revenue = change_in_revenue
+                month_greatest_decrease_in_revenue = period
 
-        if change_in_revenue < amount_greatest_decrease_in_revenue:
-            amount_greatest_decrease_in_revenue = change_in_revenue
-            period_greatest_decrease_in_revenue = period
+    create_financial_analysis(total_number_months_in_dataset, total_revenue_over_period, revenue_change_tracker,
+                              month_greatest_increase_in_revenue, amount_greatest_increase_in_revenue,
+                              amount_greatest_decrease_in_revenue, month_greatest_decrease_in_revenue)
+                              
 
-    create_financial_analysis(total_number_months_in_dataset, total_revenue_over_period, revenue_change_tracker, month_greatest_increase_in_revenue,
-                               amount_greatest_increase_in_revenue, amount_greatest_decrease_in_revenue, month_greatest_decrease_in_revenue)
+#if __name__ == '__main__':
+#    main()
